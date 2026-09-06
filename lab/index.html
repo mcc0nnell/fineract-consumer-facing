@@ -1,3 +1,9 @@
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements. See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to you under the Apache License, Version 2.0.
+-->
 <!doctype html>
 <html lang="en">
 <head>
@@ -95,10 +101,10 @@
       <article class="panel evidence pad">
         <div class="panel-head"><div><h2>Show the receipts</h2><div class="month">The pretty surface always points back to source, tests and architecture.</div></div><span class="pill">EVIDENCE FIRST</span></div>
         <div class="evidence-grid">
-          <a href="../README.md">Project README<span>Architecture, boundaries and run instructions</span></a>
-          <a href="../docs/">Manuals<span>Consumer BFF and frontend documentation</span></a>
-          <a href="../consumer/">Consumer BFF<span>Policy enforcement and Fineract integration</span></a>
-          <a href="../frontend/">Frontend<span>End-to-end consumer journeys</span></a>
+          <a href="https://github.com/mcc0nnell/fineract-consumer-facing/blob/main/README.md">Project README<span>Architecture, boundaries and run instructions</span></a>
+          <a href="https://github.com/mcc0nnell/fineract-consumer-facing/tree/main/docs">Manuals<span>Consumer BFF and frontend documentation</span></a>
+          <a href="https://github.com/mcc0nnell/fineract-consumer-facing/tree/main/consumer">Consumer BFF<span>Policy enforcement and Fineract integration</span></a>
+          <a href="https://github.com/mcc0nnell/fineract-consumer-facing/tree/main/frontend">Frontend<span>End-to-end consumer journeys</span></a>
         </div>
       </article>
     </section>
@@ -121,7 +127,6 @@
     const timeline=document.querySelector('#timeline');
     const log=document.querySelector('#eventLog');
 
-    function seededNoise(n){ return Math.sin(n*12.9898)*43758.5453%1; }
     function model(m){
       const y=m/59, s=scenarios[scenario];
       const members=Math.round(4800 + 7100*y + 180*Math.sin(m/4));
