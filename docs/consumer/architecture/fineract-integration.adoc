@@ -10,7 +10,7 @@ consumer/src/main/java/org/apache/fineract/consumer/infrastructure/fineractclien
 ├── configs/       FineractClientConfig, FineractClientProperties, FineractFeignConfig
 ├── data/          FineractHeaders (header-name constants)
 ├── interceptors/  FineractBasicAuthInterceptor, FineractTenantHeaderInterceptor,
-│                  FineractIdempotencyKeyInterceptor
+│                  FineractCorrelationIdInterceptor, FineractIdempotencyKeyInterceptor
 ├── service/       FineractCaller (exception translation helper)
 ├── spec/          fineract.json (vendored Fineract OpenAPI spec) + fineract.ignore
 └── templates/     apiClient.mustache (custom generator template)
@@ -56,10 +56,12 @@ Spring satisfies each `*Api` dependency with the Feign proxy because `*ApiClient
 
 == Authentication and tenant handling
 
-The BFF authenticates to Fineract as a single service account using HTTP Basic authentication. Two Feign `RequestInterceptor` beans, registered in `FineractClientConfig`, apply to every outbound request:
+The BFF authenticates to Fineract as a single service account using HTTP Basic authentication. Hand-written Feign `RequestInterceptor` beans registered in `FineractClientConfig` add transport metadata to outbound requests:
 
 * `FineractBasicAuthInterceptor` precomputes `Authorization: Basic ...` from `fineract.client.username` and `fineract.client.password` (defaults `mifos`/`password`, overridable via `FINERACT_SERVICE_USERNAME` and `FINERACT_SERVICE_PASSWORD`).
 * `FineractTenantHeaderInterceptor` sets `Fineract-Platform-TenantId` (the constant `FineractHeaders.TENANT_ID`) from `fineract.client.tenant-id` (default `default`, env `FINERACT_SERVICE_TENANT`). Fineract is multi-tenant and rejects requests without this header. The BFF targets exactly one tenant.
+* `FineractCorrelationIdInterceptor` propagates the current request's `X-Correlation-ID` to Fineract for end-to-end log correlation.
+* `FineractIdempotencyKeyInterceptor` conditionally propagates the separately derived idempotency key for writes, as described below.
 
 Because Fineract sees a privileged service account rather than the end user, upstream authorization tells the BFF nothing about the consumer. Every feature service therefore runs the BFF's own ABAC checks (`AccessPolicyEvaluator`, ownership resolution via `UserClientResolver`) before any Feign call.
 
@@ -68,6 +70,23 @@ The generated `ClientConfiguration` class also declares basic-auth and tenant in
 == Request body encoding: NON_EMPTY
 
 `FineractClientConfig` defines a dedicated Feign `Encoder` bean (`fineractFeignEncoder`) built on a Jackson `JsonMapper` rebuilt with `JsonInclude.Include.NON_EMPTY`. Null and empty properties are omitted from serialized request bodies. This matters because the generated model classes have many optional fields, and Fineract rejects or misinterprets requests that carry explicit nulls for fields the caller did not intend to send.
+
+== Correlation IDs
+
+`CorrelationIdFilter` establishes one `X-Correlation-ID` for every inbound BFF request. A caller-supplied value is preserved only when it is at most 64 characters and contains the bounded opaque identifier characters accepted by the filter; otherwise the BFF generates a UUID. The chosen value is echoed on the HTTP response and stored in SLF4J MDC under `correlationId` for the lifetime of the request, with cleanup in a `finally` block.
+
+`FineractCorrelationIdInterceptor` copies that same value to every outbound Fineract request, including reads. Fineract Core already supports `X-Correlation-ID` as a configurable logging correlation header; the local compose stack enables that facility so BFF and Fineract logs can be traced with the same identifier.
+
+The audit path also preserves the identifier. Server audit payloads capture the correlation ID when the application event is created, before Spring Modulith or `@Async` delivery can cross a thread boundary and lose the request MDC. Client-submitted audit rows use the BFF request correlation ID rather than accepting a browser-supplied audit-field value.
+
+Correlation and idempotency are deliberately separate concerns:
+
+----
+correlation id   = which request/execution should logs and evidence be joined to?
+idempotency key  = is this write a safe replay of a previously submitted operation?
+----
+
+A correlation ID does not make a mutation idempotent, authorize a request, or identify a business transaction.
 
 == Idempotency keys
 
@@ -107,7 +126,6 @@ This keeps the BFF's public contract stable when Fineract's API changes: a spec 
 
 == Limitations and future work
 
-* *No correlation ID is propagated to Fineract.* There is no request-ID Feign interceptor, so cross-system log tracing is manual.
 * *Fineract calls have no resilience wrapping.* There is no retry, timeout tuning, or circuit breaker around them, so a slow Fineract stalls BFF request threads.
 * *BFF-to-Fineract traffic is cleartext HTTP.* It travels over the Docker network unencrypted. Production needs TLS on this wire; mutual TLS is reserved for connections between open banking providers and the open banking endpoints.
 * *Tenant selection is a static property.* Supporting multiple tenants would require deriving the tenant per request instead of per deployment.
