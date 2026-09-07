@@ -2,7 +2,7 @@
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
- * regarding copyright ownership. The ASF licenses this file
+ * regarding copyright ownership.  The ASF licenses this file
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
@@ -16,16 +16,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-package org.apache.fineract.consumer.infrastructure.fineractclient.data;
+package org.apache.fineract.consumer.infrastructure.correlation.service;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.slf4j.MDC;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class FineractHeaders {
+public final class CorrelationIdContext {
 
-    public static final String CORRELATION_ID = "X-Correlation-ID";
-    public static final String TENANT_ID = "Fineract-Platform-TenantId";
-    public static final String IDEMPOTENCY_KEY = "Idempotency-Key";
+    public static final String MDC_KEY = "correlationId";
+
+    public static String get() {
+        return MDC.get(MDC_KEY);
+    }
+
+    public static void set(String correlationId) {
+        if (correlationId == null) {
+            clear();
+        } else {
+            MDC.put(MDC_KEY, correlationId);
+        }
+    }
+
+    public static void clear() {
+        MDC.remove(MDC_KEY);
+    }
 }

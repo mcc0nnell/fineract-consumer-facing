@@ -32,8 +32,9 @@ import org.apache.fineract.consumer.infrastructure.access.data.ConsumerAction;
 import org.apache.fineract.consumer.infrastructure.access.service.AccessPolicyEvaluator;
 import org.apache.fineract.consumer.infrastructure.access.service.UserClientResolver;
 import org.apache.fineract.consumer.infrastructure.audit.data.AuditEventType;
-import org.springframework.beans.factory.annotation.Value;
+import org.apache.fineract.consumer.infrastructure.correlation.service.CorrelationIdContext;
 import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
@@ -107,7 +108,7 @@ public class AuditCommandServiceImpl implements AuditCommandService {
             }
         }
         return AuditEvent.forClientEvent(eventUuid, eventType, eventType.getSeverity(),
-                userId, deviceFingerprint, event.getOccurredAt(), detailsJson);
+                userId, deviceFingerprint, CorrelationIdContext.get(), event.getOccurredAt(), detailsJson);
     }
 
     private boolean saveDeduplicating(AuditEvent auditEvent) {

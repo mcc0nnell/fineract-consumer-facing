@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import feign.codec.Encoder;
 import java.util.stream.Stream;
 import org.apache.fineract.consumer.infrastructure.fineractclient.interceptors.FineractBasicAuthInterceptor;
+import org.apache.fineract.consumer.infrastructure.fineractclient.interceptors.FineractCorrelationIdInterceptor;
 import org.apache.fineract.consumer.infrastructure.fineractclient.interceptors.FineractIdempotencyKeyInterceptor;
 import org.apache.fineract.consumer.infrastructure.fineractclient.interceptors.FineractTenantHeaderInterceptor;
 import org.apache.fineract.consumer.infrastructure.idempotency.service.IdempotencyKeyHolder;
@@ -50,6 +51,11 @@ public class FineractClientConfig {
     @Bean
     public FineractTenantHeaderInterceptor fineractTenantHeaderInterceptor(FineractClientProperties properties) {
         return new FineractTenantHeaderInterceptor(properties);
+    }
+
+    @Bean
+    public FineractCorrelationIdInterceptor fineractCorrelationIdInterceptor() {
+        return new FineractCorrelationIdInterceptor();
     }
 
     @Bean

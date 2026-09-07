@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.fineract.consumer.audit.command.domain;
 
 import jakarta.persistence.Column;
@@ -89,7 +88,7 @@ public class AuditEvent {
     private String details;
 
     public static AuditEvent forServerEvent(UUID eventUuid, AuditEventType eventType, AuditSeverity severity,
-            Long userId, boolean unknownPrincipal, String deviceFingerprint, String details) {
+            Long userId, boolean unknownPrincipal, String deviceFingerprint, String correlationId, String details) {
         AuditEvent event = new AuditEvent();
         event.eventUuid = eventUuid;
         event.source = AuditEventSource.SERVER;
@@ -98,13 +97,14 @@ public class AuditEvent {
         event.userId = userId;
         event.unknownPrincipal = unknownPrincipal;
         event.deviceFingerprint = deviceFingerprint;
+        event.correlationId = correlationId;
         event.details = details;
         event.receivedAt = Instant.now();
         return event;
     }
 
     public static AuditEvent forClientEvent(UUID eventUuid, AuditEventType eventType, AuditSeverity severity,
-            Long userId, String deviceFingerprint, Instant occurredAtClaimed, String details) {
+            Long userId, String deviceFingerprint, String correlationId, Instant occurredAtClaimed, String details) {
         AuditEvent event = new AuditEvent();
         event.eventUuid = eventUuid;
         event.source = AuditEventSource.CLIENT;
@@ -113,6 +113,7 @@ public class AuditEvent {
         event.userId = userId;
         event.unknownPrincipal = false;
         event.deviceFingerprint = deviceFingerprint;
+        event.correlationId = correlationId;
         event.occurredAtClaimed = occurredAtClaimed;
         event.details = details;
         event.receivedAt = Instant.now();

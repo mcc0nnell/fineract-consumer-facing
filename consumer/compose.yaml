@@ -72,6 +72,8 @@ services:
       FINERACT_DEFAULT_TENANTDB_PWD: fineractpw
       FINERACT_SERVER_SSL_ENABLED: "false"
       FINERACT_SERVER_PORT: "8080"
+      FINERACT_LOGGING_HTTP_CORRELATION_ID_ENABLED: "true"
+      FINERACT_LOGGING_HTTP_CORRELATION_ID_HEADER_NAME: X-Correlation-ID
       JAVA_TOOL_OPTIONS: "-Xmx1536m -Xms512m"
     ports:
       - "8888:8080"
@@ -150,4 +152,3 @@ configs:
     content: |
       CREATE DATABASE fineract_default;
       GRANT ALL PRIVILEGES ON DATABASE fineract_default TO fineract;
-

@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.fineract.consumer.audit.command.service;
 
 import java.util.Map;
@@ -45,20 +44,22 @@ public class ServerAuditEventListener {
     @TransactionalAuditListener
     public void onTransactionalEvent(TransactionalAuditEvent event) {
         persist(event.getEventUuid(), event.getEventType(),
-                event.getUserId(), event.isUnknownPrincipal(), event.getDeviceFingerprint(), event.getDetails());
+                event.getUserId(), event.isUnknownPrincipal(), event.getDeviceFingerprint(),
+                event.getCorrelationId(), event.getDetails());
     }
 
     @NonTransactionalAuditListener
     public void onNonTransactionalEvent(NonTransactionalAuditEvent event) {
         persist(event.getEventUuid(), event.getEventType(),
-                event.getUserId(), event.isUnknownPrincipal(), event.getDeviceFingerprint(), event.getDetails());
+                event.getUserId(), event.isUnknownPrincipal(), event.getDeviceFingerprint(),
+                event.getCorrelationId(), event.getDetails());
     }
 
     private void persist(UUID eventUuid, AuditEventType eventType, Long userId,
-            boolean unknownPrincipal, String deviceFingerprint, Map<String, Object> details) {
+            boolean unknownPrincipal, String deviceFingerprint, String correlationId, Map<String, Object> details) {
         try {
             AuditEvent entity = AuditEvent.forServerEvent(eventUuid, eventType, eventType.getSeverity(), userId,
-                    unknownPrincipal, deviceFingerprint, serialize(details));
+                    unknownPrincipal, deviceFingerprint, correlationId, serialize(details));
             auditEventCommandRepository.save(entity);
         } catch (DuplicateKeyException e) {
             log.debug("audit event {} already recorded; duplicate ignored", eventUuid);

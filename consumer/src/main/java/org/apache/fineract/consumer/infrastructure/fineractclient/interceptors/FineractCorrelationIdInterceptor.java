@@ -2,7 +2,7 @@
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
- * regarding copyright ownership. The ASF licenses this file
+ * regarding copyright ownership.  The ASF licenses this file
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
@@ -16,16 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.fineract.consumer.infrastructure.fineractclient.interceptors;
 
-package org.apache.fineract.consumer.infrastructure.fineractclient.data;
+import feign.RequestInterceptor;
+import feign.RequestTemplate;
+import org.apache.fineract.consumer.infrastructure.correlation.service.CorrelationIdContext;
+import org.apache.fineract.consumer.infrastructure.fineractclient.data.FineractHeaders;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+public class FineractCorrelationIdInterceptor implements RequestInterceptor {
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class FineractHeaders {
-
-    public static final String CORRELATION_ID = "X-Correlation-ID";
-    public static final String TENANT_ID = "Fineract-Platform-TenantId";
-    public static final String IDEMPOTENCY_KEY = "Idempotency-Key";
+    @Override
+    public void apply(RequestTemplate template) {
+        String correlationId = CorrelationIdContext.get();
+        if (correlationId != null) {
+            template.header(FineractHeaders.CORRELATION_ID, correlationId);
+        }
+    }
 }

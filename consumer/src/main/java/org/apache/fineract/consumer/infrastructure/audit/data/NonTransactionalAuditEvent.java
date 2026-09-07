@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.fineract.consumer.infrastructure.audit.data;
 
 import java.util.Map;
@@ -26,6 +25,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import org.apache.fineract.consumer.infrastructure.correlation.service.CorrelationIdContext;
 
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -38,11 +38,12 @@ public final class NonTransactionalAuditEvent {
     private final Long userId;
     private final boolean unknownPrincipal;
     private final String deviceFingerprint;
+    private final String correlationId;
     private final Map<String, Object> details;
 
     public static NonTransactionalAuditEvent of(AuditEventType eventType, Long userId,
             boolean unknownPrincipal, String deviceFingerprint, Map<String, Object> details) {
         return new NonTransactionalAuditEvent(UUID.randomUUID(), eventType, userId, unknownPrincipal,
-                deviceFingerprint, details);
+                deviceFingerprint, CorrelationIdContext.get(), details);
     }
 }

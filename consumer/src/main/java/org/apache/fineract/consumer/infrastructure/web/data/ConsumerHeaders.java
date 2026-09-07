@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.fineract.consumer.infrastructure.web.data;
 
 public final class ConsumerHeaders {
@@ -24,6 +23,7 @@ public final class ConsumerHeaders {
     private ConsumerHeaders() {
     }
 
+    public static final String CORRELATION_ID = "X-Correlation-ID";
     public static final String DEVICE_FINGERPRINT = "X-Device-Fingerprint";
     public static final String IDEMPOTENCY_KEY = "Idempotency-Key";
 }
