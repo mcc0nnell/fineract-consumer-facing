@@ -1,0 +1,153 @@
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements. See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to you under the Apache License, Version 2.0.
+-->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="A synthetic end-to-end financial institution test bench built around Apache Fineract." />
+  <title>Fineract Synthetic Fund Lab</title>
+  <style>
+    :root{color-scheme:dark;--bg:#07100d;--panel:#0b1713;--line:#244438;--text:#e7f6ef;--muted:#8db5a5;--hot:#b8ffca;--warn:#ffe18a;--bad:#ff9e9e;--shadow:0 18px 50px rgba(0,0,0,.28);--radius:18px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 20% -10%,#15382c 0,transparent 34%),var(--bg);color:var(--text)}a{color:var(--hot)}button,input{font:inherit}.shell{width:min(1480px,calc(100% - 28px));margin:auto;padding:18px 0 34px}
+    .topbar{display:flex;justify-content:space-between;gap:18px;align-items:center;border:1px solid var(--line);background:rgba(11,23,19,.78);backdrop-filter:blur(14px);padding:12px 14px;border-radius:14px;position:sticky;top:10px;z-index:10;box-shadow:var(--shadow)}.brand{display:flex;gap:10px;align-items:center;font-weight:800;letter-spacing:.06em}.lamp{width:10px;height:10px;border-radius:50%;background:var(--hot);box-shadow:0 0 18px var(--hot)}.tag{color:var(--muted);font-size:.78rem;text-transform:uppercase;letter-spacing:.12em}.status{display:flex;gap:8px;align-items:center;color:var(--hot);font-size:.82rem}
+    .hero{padding:70px 8px 28px}.eyebrow{color:var(--hot);letter-spacing:.18em;text-transform:uppercase;font-size:.78rem}.hero h1{font-size:clamp(2.7rem,8vw,7.6rem);line-height:.86;letter-spacing:-.075em;margin:16px 0 22px;max-width:1050px}.hero p{max-width:820px;color:#b6cfc5;font:500 clamp(1rem,2vw,1.25rem)/1.65 system-ui,sans-serif;margin:0}.hero strong{color:var(--text)}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}.panel{border:1px solid var(--line);background:linear-gradient(180deg,rgba(15,31,25,.94),rgba(8,19,15,.94));border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}.pad{padding:18px}.panel h2,.panel h3{margin:0}.panel-head{display:flex;justify-content:space-between;gap:12px;align-items:center;padding-bottom:14px;border-bottom:1px solid rgba(141,181,165,.14)}
+    .metric{grid-column:span 3;padding:18px;min-height:132px}.metric .label{color:var(--muted);font-size:.78rem;text-transform:uppercase;letter-spacing:.1em}.metric .value{font-size:clamp(1.55rem,4vw,2.7rem);font-weight:800;margin:14px 0 8px;letter-spacing:-.06em}.metric .delta{font-size:.78rem;color:var(--hot)}.timeline{grid-column:span 8}.scenarios{grid-column:span 4}.topology{grid-column:span 7}.events{grid-column:span 5}.evidence{grid-column:span 12}
+    .range-wrap{padding:22px 0 4px}.range-labels{display:flex;justify-content:space-between;color:var(--muted);font-size:.72rem;margin-top:8px}.year{font-size:clamp(2rem,5vw,4.5rem);font-weight:900;letter-spacing:-.07em}.month{color:var(--muted);margin-top:4px}input[type=range]{width:100%;accent-color:#b8ffca}.spark{width:100%;height:155px;margin-top:18px;background:linear-gradient(180deg,rgba(184,255,202,.035),transparent);border-radius:12px}.spark polyline{fill:none;stroke:var(--hot);stroke-width:3;vector-effect:non-scaling-stroke}.spark .fill{fill:rgba(184,255,202,.06);stroke:none}
+    .scenario-list{display:grid;gap:9px;margin-top:14px}.scenario{width:100%;text-align:left;padding:13px 14px;border:1px solid var(--line);border-radius:11px;background:#0a1511;color:var(--text);cursor:pointer;transition:.15s}.scenario:hover,.scenario:focus-visible{border-color:#4d8b70;transform:translateY(-1px)}.scenario.active{background:#14281f;border-color:#76be98}.scenario small{display:block;color:var(--muted);margin-top:5px}.scenario .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--hot);margin-right:9px}
+    .topology-map{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding-top:18px}.node{min-height:118px;padding:14px;border:1px solid var(--line);border-radius:12px;background:#091510;position:relative}.node::after{content:"";position:absolute;right:-13px;top:50%;width:13px;border-top:1px dashed #4d8b70}.node:nth-child(3n)::after,.node:last-child::after{display:none}.node strong{display:block;margin-bottom:8px}.node span{color:var(--muted);font:500 .83rem/1.45 system-ui,sans-serif}.node[data-state="warn"]{border-color:#947d3f}.node[data-state="bad"]{border-color:#995050}.node .led{float:right;width:8px;height:8px;border-radius:50%;background:var(--hot)}.node[data-state="warn"] .led{background:var(--warn)}.node[data-state="bad"] .led{background:var(--bad)}
+    .event-log{height:340px;overflow:hidden;padding-top:10px}.event{display:grid;grid-template-columns:82px 92px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid rgba(141,181,165,.1);font-size:.76rem}.event .time{color:#6f9183}.event .kind{color:var(--hot)}.event .msg{color:#c9ddd5}.event.warn .kind{color:var(--warn)}.event.bad .kind{color:var(--bad)}
+    .evidence-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:16px}.evidence a{text-decoration:none;color:var(--text);border:1px solid var(--line);border-radius:11px;padding:14px;background:#091510}.evidence a:hover{border-color:#4d8b70}.evidence a span{display:block;color:var(--muted);font-size:.76rem;margin-top:5px}.notice{font:500 .82rem/1.55 system-ui,sans-serif;color:var(--muted);padding:18px 4px 0}.pill{font-size:.72rem;color:var(--hot);border:1px solid #315e4c;border-radius:999px;padding:6px 9px;white-space:nowrap}
+    @media(max-width:980px){.metric{grid-column:span 6}.timeline,.scenarios,.topology,.events{grid-column:span 12}.evidence-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:620px){.shell{width:min(100% - 18px,1480px)}.topbar .tag{display:none}.hero{padding-top:48px}.metric{grid-column:span 12}.topology-map{grid-template-columns:1fr}.node::after{display:none}.evidence-grid{grid-template-columns:1fr}.event{grid-template-columns:70px 76px 1fr}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar"><div class="brand"><span class="lamp" aria-hidden="true"></span><span>FINERACT / FUND LAB</span><span class="tag">synthetic end-to-end test bench</span></div><div class="status"><span id="topStatus">FUND ONLINE</span><span class="pill">COMMITTED FIXTURE</span></div></header>
+    <section class="hero"><div class="eyebrow">Five years. One synthetic institution. Every layer observable.</div><h1>The fund,<br>under load.</h1><p>A replayable reference environment for <strong>Apache Fineract</strong>. The 60-month baseline below is read from a committed deterministic fixture — members, accounts, loans, payments, provider activity, exceptions, contributions and reconciliation — then scenario pressure is applied on top.</p></section>
+
+    <section class="grid" aria-label="Synthetic fund console">
+      <article class="panel metric"><div class="label">Members</div><div class="value" id="members">—</div><div class="delta" id="membersDelta">—</div></article>
+      <article class="panel metric"><div class="label">Assets</div><div class="value" id="assets">—</div><div class="delta" id="assetsDelta">—</div></article>
+      <article class="panel metric"><div class="label">Loan portfolio</div><div class="value" id="loans">—</div><div class="delta" id="loansDelta">—</div></article>
+      <article class="panel metric"><div class="label">Exceptions / 1k tx</div><div class="value" id="exceptions">—</div><div class="delta" id="exceptionsDelta">—</div></article>
+
+      <article class="panel timeline pad"><div class="panel-head"><div><h2>Five-year replay</h2><div class="month" id="monthLabel">—</div></div><div class="pill" id="scenarioPill">BASELINE</div></div><div class="year" id="yearLabel">YEAR 1</div><div class="range-wrap"><input id="timeline" type="range" min="0" max="59" value="59" aria-label="Synthetic fund month" /><div class="range-labels"><span>2022 / JAN</span><span>2024 / JAN</span><span>2026 / DEC</span></div></div><svg class="spark" viewBox="0 0 700 155" preserveAspectRatio="none" role="img" aria-label="Synthetic asset growth trend"><polygon class="fill" id="area" points="0,155 700,155"></polygon><polyline id="sparkline" points="0,120 700,60"></polyline></svg></article>
+
+      <aside class="panel scenarios pad"><div class="panel-head"><h2>Scenario injector</h2><span class="pill">DETERMINISTIC</span></div><div class="scenario-list" id="scenarioList">
+        <button class="scenario active" data-scenario="baseline"><span class="dot"></span>Baseline operations<small>Committed month values, no overlay.</small></button>
+        <button class="scenario" data-scenario="provider"><span class="dot"></span>Provider outage<small>External provider unavailable; queues build safely.</small></button>
+        <button class="scenario" data-scenario="backlog"><span class="dot"></span>Payment backlog<small>Settlement latency rises; reconciliation trails.</small></button>
+        <button class="scenario" data-scenario="fraud"><span class="dot"></span>Fraud spike<small>Exception volume jumps; controls deny suspicious flows.</small></button>
+        <button class="scenario" data-scenario="liquidity"><span class="dot"></span>Liquidity shock<small>Outflows accelerate; treasury posture tightens.</small></button>
+      </div></aside>
+
+      <article class="panel topology pad"><div class="panel-head"><h2>System topology</h2><span class="pill">OBSERVABLE BOUNDARIES</span></div><div class="topology-map">
+        <div class="node" id="nodeConsumer"><span class="led"></span><strong>Consumer surface</strong><span>Member journeys enter against seeded member/account fixtures.</span></div>
+        <div class="node" id="nodeBff"><span class="led"></span><strong>Consumer BFF</strong><span>Authentication, ABAC, audit, policy and API boundary.</span></div>
+        <div class="node" id="nodeCore"><span class="led"></span><strong>Fineract Core</strong><span>Accounts, loans, transactions and ledger state.</span></div>
+        <div class="node" id="nodeProviders"><span class="led"></span><strong>Provider mocks</strong><span>ACH, card and identity provider behavior under test.</span></div>
+        <div class="node" id="nodeRecon"><span class="led"></span><strong>Reconciliation</strong><span>Matched and unmatched payment movement by month.</span></div>
+        <div class="node" id="nodeEvidence"><span class="led"></span><strong>Evidence plane</strong><span>Fixture ID, trace IDs, assertions, reports and provenance.</span></div>
+      </div></article>
+
+      <article class="panel events pad"><div class="panel-head"><h2>Event tape</h2><span class="pill" id="eventRate">12 EVT/S</span></div><div id="eventLog" class="event-log" aria-live="polite"></div></article>
+
+      <article class="panel evidence pad"><div class="panel-head"><div><h2>Show the receipts</h2><div class="month" id="fixtureMeta">Loading fixture…</div></div><span class="pill">EVIDENCE FIRST</span></div><div class="evidence-grid">
+        <a href="./data/fund-5y.js">Five-year fixture<span>60 committed monthly records + representative entities</span></a>
+        <a href="https://github.com/mcc0nnell/fineract-consumer-facing/blob/main/README.md">Project README<span>Architecture, boundaries and run instructions</span></a>
+        <a href="https://github.com/mcc0nnell/fineract-consumer-facing/tree/main/docs">Manuals<span>Consumer BFF and frontend documentation</span></a>
+        <a href="https://github.com/mcc0nnell/fineract-consumer-facing/tree/main/consumer">Consumer BFF<span>Policy enforcement and Fineract integration</span></a>
+        <a href="https://github.com/mcc0nnell/fineract-consumer-facing/tree/main/frontend">Frontend<span>End-to-end consumer journeys</span></a>
+      </div></article>
+    </section>
+    <p class="notice">Synthetic test fixture only. No production, member, provider or institution data is represented. Scenario overlays are intentionally deterministic and make no claim about real-world solvency, security certification or provider performance.</p>
+  </main>
+
+  <script src="./data/fund-5y.js"></script>
+  <script>
+    const fixture=window.FINERACT_SYNTHETIC_FUND;
+    const rows=fixture.months.map(row=>Object.fromEntries(fixture.fields.map((field,i)=>[field,row[i]])));
+    const money=new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',notation:'compact',maximumFractionDigits:1});
+    const integer=new Intl.NumberFormat('en-US');
+    const timeline=document.querySelector('#timeline');
+    const log=document.querySelector('#eventLog');
+    let scenario='baseline';
+
+    const nodeStates={
+      baseline:{},provider:{nodeProviders:'bad',nodeRecon:'warn'},backlog:{nodeProviders:'warn',nodeRecon:'warn'},
+      fraud:{nodeBff:'warn',nodeEvidence:'warn'},liquidity:{nodeCore:'warn',nodeRecon:'warn'}
+    };
+
+    function model(index){
+      const base=rows[index],s=fixture.scenarioOverlays[scenario];
+      return {...base,assets:Math.round(base.assets*s.assetFactor),loanPortfolio:Math.round(base.loanPortfolio*s.loanFactor),exceptionsPer1k:+(base.exceptionsPer1k+s.exceptionAdd).toFixed(2),providerFailures:Math.round(base.providerEvents*s.providerFailureRate)};
+    }
+
+    function render(){
+      const i=+timeline.value,d=model(i),prev=model(Math.max(0,i-1));
+      const [year,month]=d.period.split('-');
+      document.querySelector('#members').textContent=integer.format(d.members);
+      document.querySelector('#assets').textContent=money.format(d.assets);
+      document.querySelector('#loans').textContent=money.format(d.loanPortfolio);
+      document.querySelector('#exceptions').textContent=d.exceptionsPer1k.toFixed(2);
+      document.querySelector('#membersDelta').textContent=`${integer.format(d.accounts)} seeded-account population`;
+      document.querySelector('#assetsDelta').textContent=`${money.format(d.contributionAmount)} contributions · ${integer.format(d.contributionCount)} deposits`;
+      document.querySelector('#loansDelta').textContent=`${integer.format(d.payments)} payments · ${integer.format(d.providerEvents)} provider events`;
+      document.querySelector('#exceptionsDelta').textContent=`${integer.format(d.unmatchedPayments)} unmatched · ${d.reconciliationBatches} reconciliation batches`;
+      document.querySelector('#yearLabel').textContent=`YEAR ${+year-2021}`;
+      document.querySelector('#monthLabel').textContent=`${d.period} · committed month ${i+1} of ${rows.length}`;
+      document.querySelector('#scenarioPill').textContent=fixture.scenarioOverlays[scenario].label;
+      document.querySelector('#eventRate').textContent=`${fixture.scenarioOverlays[scenario].eventRate} EVT/S`;
+      document.querySelector('#topStatus').textContent=scenario==='provider'?'FUND DEGRADED':'FUND ONLINE';
+      document.querySelector('#fixtureMeta').textContent=`${fixture.meta.fixtureId} · seed ${fixture.meta.seed} · ${fixture.meta.periodStart} → ${fixture.meta.periodEnd}`;
+      drawSpark(i);generateEvents(d,i);
+    }
+
+    function drawSpark(active){
+      const values=rows.map((_,i)=>model(i).assets),min=Math.min(...values)*.94,max=Math.max(...values)*1.03;
+      const pts=values.map((v,i)=>[i/(values.length-1)*700,145-(v-min)/(max-min)*125]);
+      const visible=pts.slice(0,active+1);if(visible.length===1)visible.push([1,visible[0][1]]);
+      document.querySelector('#sparkline').setAttribute('points',visible.map(p=>p.join(',')).join(' '));
+      document.querySelector('#area').setAttribute('points',`0,155 ${visible.map(p=>p.join(',')).join(' ')} ${visible.at(-1)[0]},155`);
+    }
+
+    function eventRows(d,index){
+      const member=fixture.members[index%fixture.members.length],account=fixture.accounts[index%fixture.accounts.length],loan=fixture.loans[index%fixture.loans.length];
+      const trace=`${d.period.replace('-','')}-${String(index+1).padStart(2,'0')}`;
+      const base=[
+        ['ACCOUNT',`${account.id} · member ${member.id} · monthly state materialized · trace ${trace}-A`],
+        ['PAYMENT',`${integer.format(d.payments)} payments observed · ${integer.format(d.providerEvents)} mock-provider events · trace ${trace}-P`],
+        ['LOAN',`${loan.id} · ${loan.type} · portfolio ${money.format(d.loanPortfolio)} · trace ${trace}-L`],
+        ['RECON',`${integer.format(d.reconciledPayments)} matched / ${d.unmatchedPayments} unmatched across ${d.reconciliationBatches} batches · trace ${trace}-R`,d.unmatchedPayments>2?'warn':''],
+        ['CONTRIB',`${integer.format(d.contributionCount)} contributions totaling ${money.format(d.contributionAmount)} · trace ${trace}-C`],
+        ['EVIDENCE',`${fixture.meta.fixtureId} · period ${d.period} · row ${index+1}/60 · trace ${trace}-E`]
+      ];
+      if(scenario==='provider')base.unshift(['PROVIDER',`${d.providerFailures} simulated provider failures; replay queue engaged · trace ${trace}-X`,'bad']);
+      if(scenario==='backlog')base.unshift(['QUEUE',`synthetic settlement backlog applied to ${d.period} baseline · trace ${trace}-X`,'warn']);
+      if(scenario==='fraud')base.unshift(['ABAC',`fraud-pressure overlay adds ${fixture.scenarioOverlays.fraud.exceptionAdd} exceptions / 1k · trace ${trace}-X`,'bad']);
+      if(scenario==='liquidity')base.unshift(['TREASURY',`asset stress factor ${(fixture.scenarioOverlays.liquidity.assetFactor*100).toFixed(1)}% applied · trace ${trace}-X`,'warn']);
+      return base;
+    }
+
+    function generateEvents(d,index){
+      log.innerHTML='';
+      eventRows(d,index).slice(0,8).forEach((item,i)=>{const div=document.createElement('div');div.className='event '+(item[2]||'');div.innerHTML=`<span class="time">T+${String(i).padStart(2,'0')}</span><span class="kind">${item[0]}</span><span class="msg">${item[1]}</span>`;log.appendChild(div)});
+    }
+
+    function setScenario(next){
+      scenario=next;document.querySelectorAll('.scenario').forEach(b=>b.classList.toggle('active',b.dataset.scenario===next));
+      document.querySelectorAll('.node').forEach(n=>n.removeAttribute('data-state'));Object.entries(nodeStates[next]).forEach(([id,state])=>document.querySelector('#'+id)?.setAttribute('data-state',state));render();
+    }
+
+    timeline.addEventListener('input',render);
+    document.querySelector('#scenarioList').addEventListener('click',e=>{const b=e.target.closest('button[data-scenario]');if(b)setScenario(b.dataset.scenario)});
+    render();
+  </script>
+</body>
+</html>
